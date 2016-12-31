@@ -1,0 +1,19 @@
+{
+  "name": "lifx.js",
+  "version": "0.1.0",
+  "description": "A LIFX API for Node.JS",
+  "main": "./src/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FNCxPro/lifx.js.git"
+  },
+  "author": "Relative <relative@outlook.ie> (https://relative.design)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/FNCxPro/lifx.js/issues"
+  },
+  "homepage": "https://github.com/FNCxPro/lifx.js#readme",
+  "dependencies": {
+    "requestify": "^0.2.5"
+  }
+}
