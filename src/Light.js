@@ -7,6 +7,16 @@ class Light {
    * @param {LIFX} LIFX - LIFX HTTP API Class to use when doing certain methods.
    */
   constructor(options, LIFX) {
+    /**
+     * LIFX Class
+     * @type {LIFX}
+     * @memberof external:LIFX
+     */
+    this.LIFX = LIFX
+
+    this.initialize(options)
+  }
+  initialize(options) {
     if(!options || typeof options !== 'object') throw new TypeError('Options must be an object.')
     if(!options.id || typeof options.id !== 'string') throw new TypeError('options.id must be a string.')
     if(!options.uuid || typeof options.uuid !== 'string') throw new TypeError('options.uuid must be a string.')
@@ -24,12 +34,6 @@ class Light {
     if(!options.product.identifier || typeof options.product.identifier !== 'string') throw new TypeError('options.product.identifier must be a string.')
     if(!options.product.capabilities || typeof options.product.capabilities !== 'object') throw new TypeError('options.product.capabilities must be an object.')
     //TODO: More checking?
-    /**
-     * LIFX Class
-     * @type {LIFX}
-     * @memberof external:LIFX
-     */
-    this.LIFX = LIFX
 
     this.options = options
     /**
@@ -87,6 +91,7 @@ class Light {
     this.product = options.product
   }
 
+
   /**
    * Refreshes the Light information.
    * @return {Promise}
@@ -98,7 +103,7 @@ class Light {
           Authorization: `Bearer ${this.LIFX.token}`
         }
       }).then(res => {
-        this = new Light(res.getBody(), this.LIFX)
+        this.initialize(res.getBody()[0])
         fulfill(this)
       })
       .fail(res => {
@@ -115,7 +120,7 @@ class Light {
   togglePower(duration) {
     return new Promise((fulfill, reject) => {
     requestify.post(`${this.LIFX.apiBase}/v1/lights/${this.id}/toggle`, {
-      duration: duration.toString() || '1.0'
+      duration: duration || '1.0'
     }, {
         headers: {
           Authorization: `Bearer ${this.LIFX.token}`

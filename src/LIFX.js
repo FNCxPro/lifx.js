@@ -30,7 +30,8 @@ class LIFX {
    * @return {Promise}
    */
   getLights(selector) {
-    let sel = selector.toString() || 'all'
+    let sel = selector || 'all'
+    sel = sel.toString()
     return new Promise((fulfill, reject) => {
       requestify.get(`${this.apiBase}/v1/lights/${sel}`, {
         headers: {
