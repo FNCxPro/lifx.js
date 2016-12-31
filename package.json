@@ -1,6 +1,6 @@
 {
   "name": "lifx.js",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A LIFX API for Node.JS",
   "main": "./src/index.js",
   "repository": {

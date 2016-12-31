@@ -51,7 +51,7 @@ class LIFX {
       })
     })
   }
-
+  
   /**
    * Set the token that the class will use to authenticate.
    * @param {String} token - The token to use.

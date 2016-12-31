@@ -113,15 +113,38 @@ class Light {
   }
 
   /**
+   * Set state of Light
+   * @param {Object} state - Object of the state information
+   * @return {Promise}
+   */
+  setState(state) {
+    if(!state || typeof state !== 'object') throw new TypeError('State must be an Object.')
+    if(state.color && !this.product.capabilities.has_color) throw new Error(`${this.id} does not have color capabilities.`)
+    if(state.infrared && !this.product.capabilities.has_ir) throw new Error(`${this.id} does not have infrared capabilities.`)
+    return new Promise((fulfill, reject) => {
+      requestify.put(`${this.LIFX.apiBase}/v1/lights/${this.id}/state`, state, {
+        headers: {
+          Authorization: `Bearer ${this.LIFX.token}`
+        }
+      }).then(res => {
+        fulfill(this.refresh())
+      })
+      .fail(res => {
+        reject(res)
+      })
+    })
+  }
+
+  /**
    * Toggles power of the Light
    * @param {number} [duration] - The time in seconds to spend perfoming the power toggle.
    * @return {Promise}
    */
   togglePower(duration) {
     return new Promise((fulfill, reject) => {
-    requestify.post(`${this.LIFX.apiBase}/v1/lights/${this.id}/toggle`, {
-      duration: duration || '1.0'
-    }, {
+      requestify.post(`${this.LIFX.apiBase}/v1/lights/${this.id}/toggle`, {
+        duration: duration || '1.0'
+      }, {
         headers: {
           Authorization: `Bearer ${this.LIFX.token}`
         }
