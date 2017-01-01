@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>lifx.js Source: Light.js</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.paper.css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top navbar-inverse">
+<div class="container">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html">lifx.js</a>
+		<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+        </button>
+	</div>
+	<div class="navbar-collapse collapse" id="topNavigation">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="LIFX.html">LIFX</a></li><li><a href="Light.html">Light</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+        
+            <div class="col-sm-3 col-md-3">
+                <form class="navbar-form" role="search">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search" name="q" id="search-input">
+                        <div class="input-group-btn">
+                            <button class="btn btn-default" id="search-submit"><i class="glyphicon glyphicon-search"></i></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        
+	</div>
+
+</div>
+</div>
+
+
+<div class="container" id="toc-content">
+<div class="row">
+
+	
+	<div class="col-md-12">
+	
+		<div id="main">
+			
+
+		<h1 class="page-title">Source: Light.js</h1>
+    
+<section>
+    <article>
+        <pre
+            class="sunlight-highlight-javascript linenums">const requestify = require('requestify')
+/**
+ * LIFX Light class
+ * @class
+ */
+class Light {
+  /**
+   * Create a new Light class.
+   * @param {Object} options - Options to create the light with.
+   * @param {LIFX} LIFX - LIFX HTTP API Class to use when doing certain methods.
+   */
+  constructor(options, LIFX) {
+    /**
+     * LIFX Class
+     * @type {LIFX}
+     */
+    this.LIFX = LIFX
+    
+    this.initialize(options)
+  }
+  initialize(options) {
+    if(!options || typeof options !== 'object') throw new TypeError('Options must be an object.')
+    if(!options.id || typeof options.id !== 'string') throw new TypeError('options.id must be a string.')
+    if(!options.uuid || typeof options.uuid !== 'string') throw new TypeError('options.uuid must be a string.')
+    if(!options.label || typeof options.label !== 'string') throw new TypeError('options.label must be a string.')
+    if(typeof options.connected !== 'boolean') throw new TypeError('options.connected must be a boolean.')
+    if(!options.power || typeof options.power !== 'string') throw new TypeError('options.power must be a string.')
+    if(!options.brightness || typeof options.brightness !== 'number') throw new TypeError('options.brightness must be a number.')
+    if(!options.group || typeof options.group !== 'object') throw new TypeError('options.group must be an object.')
+    if(!options.location || typeof options.location !== 'object') throw new TypeError('options.location must be an object.')
+    if(!options.product || typeof options.product !== 'object') throw new TypeError('options.product must be an object.')
+
+    /* product checking */
+    if(!options.product.name || typeof options.product.name !== 'string') throw new TypeError('options.product.name must be a string.')
+    if(!options.product.company || typeof options.product.company !== 'string') throw new TypeError('options.product.company must be a string.')
+    if(!options.product.identifier || typeof options.product.identifier !== 'string') throw new TypeError('options.product.identifier must be a string.')
+    if(!options.product.capabilities || typeof options.product.capabilities !== 'object') throw new TypeError('options.product.capabilities must be an object.')
+    //TODO: More checking?
+
+    this.options = options
+    /**
+     * ID of the Light
+     * @type {String}
+     */
+    this.id = options.id
+
+    /**
+     * Unique ID of the Light
+     * @type {String}
+     */
+    this.uuid = options.uuid
+
+    /**
+     * Label of the Light
+     * @type {String}
+     */
+    this.label = options.label
+
+    /**
+     * Connection status of the Light
+     * @type {boolean}
+     */
+    this.connected = options.connected
+
+    /**
+     * If the light is on/off.
+     * @type {string}
+     */
+    this.power = options.power
+
+    /**
+     * The brightness of the Light.
+     * @type {number}
+     */
+    this.brightness = options.brightness
+
+    /**
+     * The group of the Light.
+     * @type {Object}
+     */
+    this.group = options.group
+
+    /**
+     * The location of the Light.
+     * @type {Object}
+     */
+    this.location = options.location
+
+    /**
+     * What the light is.
+     * @type {Object}
+     */
+    this.product = options.product
+  }
+
+
+  /**
+   * Refreshes the Light information.
+   * @return {Promise}
+   */
+  refresh() {
+    return new Promise((fulfill, reject) => {
+      requestify.get(`${this.LIFX.apiBase}/v1/lights/${this.id}`, {
+        headers: {
+          Authorization: `Bearer ${this.LIFX.token}`
+        }
+      }).then(res => {
+        this.initialize(res.getBody()[0])
+        fulfill(this)
+      })
+      .fail(res => {
+        reject(res)
+      })
+    })
+  }
+
+  /**
+   * Set state of Light
+   * @param {Object} state - Object of the state information
+   * @return {Promise}
+   */
+  setState(state) {
+    if(!state || typeof state !== 'object') throw new TypeError('State must be an Object.')
+    if(state.color &amp;&amp; !this.product.capabilities.has_color) throw new Error(`${this.id} does not have color capabilities.`)
+    if(state.infrared &amp;&amp; !this.product.capabilities.has_ir) throw new Error(`${this.id} does not have infrared capabilities.`)
+    return new Promise((fulfill, reject) => {
+      requestify.put(`${this.LIFX.apiBase}/v1/lights/${this.id}/state`, state, {
+        headers: {
+          Authorization: `Bearer ${this.LIFX.token}`
+        }
+      }).then(res => {
+        fulfill(this.refresh())
+      })
+      .fail(res => {
+        reject(res)
+      })
+    })
+  }
+
+  /**
+   * Toggles power of the Light
+   * @param {number} [duration] - The time in seconds to spend perfoming the power toggle.
+   * @return {Promise}
+   */
+  togglePower(duration) {
+    return new Promise((fulfill, reject) => {
+      requestify.post(`${this.LIFX.apiBase}/v1/lights/${this.id}/toggle`, {
+        duration: duration || '1.0'
+      }, {
+        headers: {
+          Authorization: `Bearer ${this.LIFX.token}`
+        }
+      }).then(res => {
+        fulfill(this.refresh())
+      })
+      .fail(res => {
+        reject(res)
+      })
+    })
+  }
+}
+
+module.exports = Light</pre>
+    </article>
+</section>
+
+
+
+
+
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+
+	
+
+</div>
+</div>
+
+
+    <div class="modal fade" id="searchResults">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Search results</h4>
+          </div>
+          <div class="modal-body"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div>
+
+
+<footer>
+
+
+	<span class="copyright">
+	lifx.js Copyright © 2012-2015 Relative
+	</span>
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a>
+	
+		on Sat Dec 31st 2016
+	
+	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
+</span>
+</footer>
+
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/toc.js"></script>
+
+    <script type="text/javascript" src="scripts/fulltext-search-ui.js"></script>
+
+
+<script>
+$( function () {
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
+
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	} );
+
+	$( ".tutorial-section pre, .readme-section pre, pre.prettyprint.source" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
+			lang = langClassMatch ? langClassMatch[1] : "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( "sunlight-highlight-" + lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	Sunlight.highlightAll( {
+		lineNumbers : true,
+		showMenu : true,
+		enableDoclinks : true
+	} );
+
+	$.catchAnchorLinks( {
+        navbarOffset: 10
+	} );
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			return $( heading ).attr( "id" ) || ( prefix + i );
+		},
+		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4",
+		showAndHide : false,
+		smoothScrolling: true
+	} );
+
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+
+    $( "table" ).each( function () {
+      var $this = $( this );
+      $this.addClass('table');
+    } );
+
+} );
+</script>
+
+
+
+<!--Navigation and Symbol Display-->
+
+
+<!--Google Analytics-->
+
+
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            SearcherDisplay.init();
+        });
+    </script>
+
+
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>lifx.js</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="./css/bulma.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/default.min.css">
+  </head>
+  <body>
+    <section class="hero is-dark is-fullheight is-default is-bold">
+      <div class="hero-head">
+        <nav class="nav has-shadow">
+          <div class="container">
+            <div class="nav-left">
+              <a class="nav-item" href="#">lifx.js</a>
+            </div>
+            <span id="nav-toggle" class="nav-toggle">
+              <span></span>
+              <span></span>
+              <span></span>
+            </span>
+            <div class="nav-center">
+              <a class="nav-item" href="https://github.com/FNCxPro/lifx.js"><i class="fa fa-github"></i></a>
+            </div>
+            <div id="nav-menu" class="nav-right nav-menu">
+              <a class="nav-item is-active" href="#">Home</a>
+              <a class="nav-item" href="/docs/">Documentation</a>
+            </div>
+          </div>
+        </nav>
+      </div>
+      <div class="hero-body">
+        <div class="container">
+          <div class="columns is-vcentered">
+            <div class="column is-4 has-text-centered">
+              <h1 class="title is-2">
+                lifx.js
+              </h1>
+            </div>
+            <div class="column is-6 is-offset-2">
+              <h2 class="subtitle is-3">An API wrapper written in Node.js for the <a href="https://api.developer.lifx.com">LIFX HTTP API</a>.</h2><br>
+              <p><h4>Installation:</h4> <pre><code class="bash">npm install lifx.js</code></pre><br><h4>Example:</h4> <pre><code>const LIFX = require('lifx.js');
+const api = new LIFX.LIFX("your lifx http api token");
+api.getLights().then(lights => {
+  for(let _lt in lights) {
+    if(!lights.hasOwnProperty(_lt)) continue;
+    let light = lights[_lt];
+    light.togglePower();
+    console.log(light.label);
+  }
+}).catch(res => {
+  console.error(res);
+})</code></pre></p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="hero-foot">
+        <div class="container has-text-centered">
+          <p class="is-2">Developed by <a href="https://twitter.com/SethFNC">Relative</a>.</p>
+        </div>
+      </div>
+      <br>
+    </section>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js"></script>
+    <script>
+      $(document).ready(function() {
+        $('pre code').each(function(i, block) {
+          hljs.highlightBlock(block);
+        });
+      });
+    </script>
+  </body>
+</html>

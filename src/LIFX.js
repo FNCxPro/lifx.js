@@ -1,6 +1,9 @@
 const requestify = require('requestify')
 const Light = require('./Light')
-/* LIFX HTTP API Class */
+/**
+ * LIFX HTTP API class
+ * @class
+ */
 class LIFX {
   /**
    * Create an instance of the LIFX HTTP API

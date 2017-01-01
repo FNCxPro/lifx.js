@@ -1,11 +1,17 @@
 {
   "name": "lifx.js",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "A LIFX API for Node.JS",
   "main": "./src/index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/FNCxPro/lifx.js.git"
+  },
+  "scripts": {
+    "build": "grunt"
+  },
+  "engines": {
+    "node": ">=6.9.0"
   },
   "author": "Relative <relative@outlook.ie> (https://relative.design)",
   "license": "MIT",
@@ -14,6 +20,13 @@
   },
   "homepage": "https://github.com/FNCxPro/lifx.js#readme",
   "dependencies": {
+    "jsdoc": "^3.4.3",
     "requestify": "^0.2.5"
+  },
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-contrib-jshint": "^1.1.0",
+    "grunt-jsdoc": "^2.1.0",
+    "ink-docstrap": "^1.3.0"
   }
 }

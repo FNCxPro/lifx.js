@@ -1,5 +1,8 @@
 const requestify = require('requestify')
-/* LIFX Light Class */
+/**
+ * LIFX Light class
+ * @class
+ */
 class Light {
   /**
    * Create a new Light class.
@@ -10,10 +13,9 @@ class Light {
     /**
      * LIFX Class
      * @type {LIFX}
-     * @memberof external:LIFX
      */
     this.LIFX = LIFX
-
+    
     this.initialize(options)
   }
   initialize(options) {
@@ -21,7 +23,7 @@ class Light {
     if(!options.id || typeof options.id !== 'string') throw new TypeError('options.id must be a string.')
     if(!options.uuid || typeof options.uuid !== 'string') throw new TypeError('options.uuid must be a string.')
     if(!options.label || typeof options.label !== 'string') throw new TypeError('options.label must be a string.')
-    if(!options.connected || typeof options.connected !== 'boolean') throw new TypeError('options.connected must be a boolean.')
+    if(typeof options.connected !== 'boolean') throw new TypeError('options.connected must be a boolean.')
     if(!options.power || typeof options.power !== 'string') throw new TypeError('options.power must be a string.')
     if(!options.brightness || typeof options.brightness !== 'number') throw new TypeError('options.brightness must be a number.')
     if(!options.group || typeof options.group !== 'object') throw new TypeError('options.group must be an object.')
